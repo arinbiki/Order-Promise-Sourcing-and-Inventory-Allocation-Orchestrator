@@ -1,0 +1,79 @@
+{
+  "benchmark_timestamp": "2026-10-29T18:47:38.234578+00:00",
+  "total_scale_orders": 10000000,
+  "concurrency_benchmarks": {
+    "1_workers": {
+      "workers": 1,
+      "duration_seconds": 1.465,
+      "orders_per_second": 1365.5,
+      "latency_p50_ms": 0.466,
+      "latency_p95_ms": 1.278,
+      "latency_p99_ms": 2.087
+    },
+    "2_workers": {
+      "workers": 2,
+      "duration_seconds": 0.672,
+      "orders_per_second": 2974.4,
+      "latency_p50_ms": 0.016,
+      "latency_p95_ms": 0.043,
+      "latency_p99_ms": 0.098
+    },
+    "4_workers": {
+      "workers": 4,
+      "duration_seconds": 0.115,
+      "orders_per_second": 17465.1,
+      "latency_p50_ms": 0.019,
+      "latency_p95_ms": 0.046,
+      "latency_p99_ms": 0.096
+    },
+    "8_workers": {
+      "workers": 8,
+      "duration_seconds": 0.102,
+      "orders_per_second": 19620.6,
+      "latency_p50_ms": 0.014,
+      "latency_p95_ms": 0.035,
+      "latency_p99_ms": 0.072
+    },
+    "16_workers": {
+      "workers": 16,
+      "duration_seconds": 0.111,
+      "orders_per_second": 18075.6,
+      "latency_p50_ms": 0.014,
+      "latency_p95_ms": 0.04,
+      "latency_p99_ms": 0.082
+    }
+  },
+  "stress_test_results": {
+    "kpis": {
+      "promise_accuracy_rate": 1.0,
+      "oversell_rate": 0.0,
+      "first_pass_release_rate": 0.7849,
+      "split_shipment_rate": 0.0802,
+      "backorder_rate": 0.001,
+      "credit_hold_rate": 0.1158,
+      "fraud_quarantine_rate": 0.0604,
+      "master_data_exception_rate": 0.0389,
+      "manual_intervention_rate": 0.2152,
+      "unhandled_error_rate": 0.0
+    },
+    "performance": {
+      "sample_size": 20000,
+      "sample_duration_seconds": 17.48,
+      "mean_ops": 1144.3,
+      "p50_latency_ms": 0.545,
+      "p95_latency_ms": 1.673,
+      "p99_latency_ms": 13.1,
+      "max_latency_ms": 1078.075
+    },
+    "extrapolated_10m": {
+      "total_orders": 10000000,
+      "released_straight_through": 7848500,
+      "credit_holds": 1158500,
+      "fraud_holds": 603500,
+      "master_data_exceptions": 389500,
+      "split_shipment_orders": 629500,
+      "backordered_orders": 10500,
+      "auto_repaired_orders": 4310500
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "65371ad6-4592-4b3f-b533-88a3c5ff807e",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "D:\\Docker\\windmill\\windmill projects\\Order Promise, Sourcing, and Inventory Allocation Orchestrator\\.archify\\architecture-order-scm-orchestrator-20261030-004000\\candidate.json",
+  "output": "D:\\Docker\\windmill\\windmill projects\\Order Promise, Sourcing, and Inventory Allocation Orchestrator\\visuals\\order-orchestrator-architecture.html",
+  "specification": {
+    "sha256": "ae5759720f9f054c566bd9d8d298d73d1dfb5e8ec08401c8ac175b33f2dea12c",
+    "bytes": 6942
+  },
+  "artifact": {
+    "sha256": "9a1f8d64c7e4b7f25c2756d543710e04377a30f6fb7602777cefb4d06c4edc32",
+    "bytes": 873212
+  }
+}

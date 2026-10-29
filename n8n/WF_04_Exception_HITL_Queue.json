@@ -1,0 +1,47 @@
+{
+  "name": "SCM_04_Exception_HITL_Queue",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "scm-exception-override",
+        "options": {}
+      },
+      "name": "Exception Review Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Audit manual override\nconst body = $input.first().json.body || $input.first().json;\nreturn [{\n    json: {\n        case_id: body.case_id,\n        override_type: body.override_type || 'CREDIT_RELEASE',\n        approved_by: body.user || 'OPS_MANAGER',\n        timestamp: new Date().toISOString(),\n        action: 'RESUME_ORCHESTRATION'\n    }\n}];"
+      },
+      "name": "Process Approval",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Exception Review Webhook": {
+      "main": [
+        [
+          {
+            "node": "Process Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

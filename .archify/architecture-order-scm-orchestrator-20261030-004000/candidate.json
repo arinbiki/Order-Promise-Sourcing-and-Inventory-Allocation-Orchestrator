@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Deterministic Order Promise, Sourcing & Inventory Allocation Orchestrator",
+    "output": "visuals/order-orchestrator-architecture.html",
+    "visual_preset": "signal-flow",
+    "quality_profile": "showcase",
+    "animation": "trace"
+  },
+  "components": [
+    { "id": "ecom", "type": "external", "label": "E-Commerce", "sublabel": "Shopify / Magento", "pos": [70, 160], "size": [140, 60], "tag": "Webhook / HTTP" },
+    { "id": "b2b", "type": "external", "label": "B2B Customer Portal", "sublabel": "Direct B2B Web", "pos": [70, 280], "size": [140, 60], "tag": "REST API" },
+    { "id": "edi", "type": "external", "label": "EDI Gateway", "sublabel": "ANSI X12 850 / 860", "pos": [70, 400], "size": [140, 60], "tag": "AS2 / SFTP" },
+    { "id": "carrier_tms", "type": "external", "label": "Carrier TMS", "sublabel": "Project44 / EasyPost", "pos": [70, 520], "size": [140, 60], "tag": "Transit Lead Times" },
+
+    { "id": "n8n_ingest", "type": "cloud", "label": "SCM_01 Ingestion Gate", "sublabel": "Idempotency & Normalize", "pos": [260, 280], "size": [150, 64], "tag": "SHA-256 Gate" },
+    { "id": "n8n_router", "type": "cloud", "label": "SCM_02 FSM Router", "sublabel": "Workflow Dispatcher", "pos": [460, 280], "size": [150, 64], "tag": "Async Workflow" },
+
+    { "id": "wm_validate", "type": "backend", "label": "Schema & Master Data", "sublabel": "Auto-Repair & Enrichment", "pos": [670, 180], "size": [160, 62], "tag": "Zero LLM" },
+    { "id": "wm_finance", "type": "security", "label": "Financial & Fraud Gate", "sublabel": "Credit Limit & Watchlist", "pos": [670, 340], "size": [160, 62], "tag": "Policy Rules" },
+
+    { "id": "wm_inv_conv", "type": "backend", "label": "Inventory Convergence", "sublabel": "Multi-Source & Safety Haircut", "pos": [890, 180], "size": [160, 62], "tag": "Real-Time ATP" },
+    { "id": "wm_alloc_opt", "type": "backend", "label": "Allocation Optimizer", "sublabel": "Discrete Cost & Split Penalty", "pos": [890, 340], "size": [160, 62], "tag": "$25 Split Penalty" },
+
+    { "id": "wm_promiser", "type": "backend", "label": "Deterministic Promiser", "sublabel": "Cutoff & Calendar Critical Path", "pos": [1110, 180], "size": [160, 62], "tag": "Confidence Score" },
+    { "id": "wm_release", "type": "backend", "label": "Release Packet Builder", "sublabel": "Idempotent WMS Dispatch", "pos": [1110, 340], "size": [160, 62], "tag": "Sagas Prep" },
+
+    { "id": "pg_blackboard", "type": "database", "label": "PostgreSQL 18 Blackboard", "sublabel": "order_scm (13 Relational Tables)", "pos": [890, 500], "size": [170, 66], "tag": "ACID FSM Engine" },
+    { "id": "kpi_datamart", "type": "database", "label": "KPI & Audit Store", "sublabel": "kpi_fact & audit_event", "pos": [1110, 500], "size": [160, 66], "tag": "CDC Streaming" },
+
+    { "id": "wms_exec", "type": "external", "label": "Enterprise WMS / 3PL", "sublabel": "Manhattan / Blue Yonder", "pos": [1340, 200], "size": [160, 62], "tag": "EDI 940 / Waves" },
+    { "id": "erp_core", "type": "external", "label": "Enterprise Core ERP", "sublabel": "SAP S/4HANA / NetSuite", "pos": [1340, 340], "size": [160, 62], "tag": "Sales Order / STO" },
+    { "id": "hitl_desk", "type": "external", "label": "Operations HITL Desk", "sublabel": "Slack / Teams Exception Cards", "pos": [1340, 480], "size": [160, 62], "tag": "Human Override" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Commercial Channels", "wraps": ["ecom", "b2b", "edi", "carrier_tms"], "pad": 16 },
+    { "kind": "security-group", "label": "n8n Workflow Integration Layer", "wraps": ["n8n_ingest", "n8n_router"], "pad": 16 },
+    { "kind": "region", "label": "Windmill Deterministic Execution Core (Zero LLM, 0.54ms p50)", "wraps": ["wm_validate", "wm_finance", "wm_inv_conv", "wm_alloc_opt", "wm_promiser", "wm_release"], "pad": 20 },
+    { "kind": "security-group", "label": "PostgreSQL 18 State Blackboard Layer", "wraps": ["pg_blackboard", "kpi_datamart"], "pad": 16 },
+    { "kind": "region", "label": "Enterprise Execution & Downstream", "wraps": ["wms_exec", "erp_core", "hitl_desk"], "pad": 16 }
+  ],
+  "connections": [
+    { "id": "ecom-to-ingest", "from": "ecom", "to": "n8n_ingest", "label": "Order Webhook", "variant": "emphasis" },
+    { "id": "b2b-to-ingest", "from": "b2b", "to": "n8n_ingest", "label": "REST Checkout", "variant": "emphasis" },
+    { "id": "edi-to-ingest", "from": "edi", "to": "n8n_ingest", "label": "EDI 850 PO" },
+    { "id": "carrier-to-blackboard", "from": "carrier_tms", "to": "pg_blackboard", "label": "Lane Lead Times", "variant": "dashed" },
+    { "id": "ingest-to-router", "from": "n8n_ingest", "to": "n8n_router", "label": "Deduplicated Order", "variant": "emphasis" },
+    { "id": "router-to-validate", "from": "n8n_router", "to": "wm_validate", "label": "Trigger Decision Job", "variant": "emphasis" },
+    { "id": "validate-to-finance", "from": "wm_validate", "to": "wm_finance", "label": "Enriched Order" },
+    { "id": "finance-to-inv", "from": "wm_finance", "to": "wm_inv_conv", "label": "Passed Financial Gate" },
+    { "id": "inv-to-alloc", "from": "wm_inv_conv", "to": "wm_alloc_opt", "label": "ATP / CTP Positions" },
+    { "id": "alloc-to-promiser", "from": "wm_alloc_opt", "to": "wm_promiser", "label": "Optimal Sourcing Plan" },
+    { "id": "promiser-to-release", "from": "wm_promiser", "to": "wm_release", "label": "Committed Promise" },
+    { "id": "release-to-blackboard", "from": "wm_release", "to": "pg_blackboard", "label": "Lock Hard Allocation", "variant": "emphasis", "fromSide": "bottom", "toSide": "top" },
+    { "id": "release-to-kpi", "from": "wm_release", "to": "kpi_datamart", "label": "Emit KPI Facts", "fromSide": "bottom", "toSide": "top" },
+    { "id": "release-to-wms", "from": "wm_release", "to": "wms_exec", "label": "EDI 940 Release Packet", "variant": "emphasis" },
+    { "id": "release-to-erp", "from": "wm_release", "to": "erp_core", "label": "Confirm Order / STO", "variant": "dashed" },
+    { "id": "kpi-to-hitl", "from": "kpi_datamart", "to": "hitl_desk", "label": "Exception Review Stream", "variant": "security" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "Deterministic Performance", "items": ["0.54 ms (p50) sub-millisecond execution", "Peak throughput exceeding 19,620 orders/sec", "Zero runtime LLM calls — 100% auditable closed-form algorithms"] },
+    { "dot": "cyan", "title": "State Blackboard & Optimization", "items": ["PostgreSQL 18 manages 17 discrete FSM states and multi-bucket inventory", "Single-node preference with $25/split penalty cost minimization", "Real-time CTP future discovery & pre-approved SKU substitution"] },
+    { "dot": "rose", "title": "Operational Resilience", "items": ["Automatic 20% safety haircut on stale inventory feeds (> 120m lag)", "Idempotent SHA-256 duplicate suppression", "Two-phase commit with Sagas compensation rollback on WMS failure"] }
+  ]
+}

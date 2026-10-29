@@ -1,0 +1,80 @@
+{
+  "name": "SCM_01_Channel_Order_Ingestion",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-scm-ingest",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook Ingestion",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalize event & compute idempotency hash\nconst payload = $input.first().json.body || $input.first().json;\nconst channel = (payload.channel || 'DIRECT').toUpperCase();\nconst extRef = payload.external_order_ref || 'ORD-' + Date.now();\nconst lines = payload.lines || [];\n\nconst lineSig = lines.map(l => `${l.sku}:${l.quantity}`).join('|');\nconst rawSig = `${channel}#${extRef}#${lineSig}`;\n\nlet hash = 0;\nfor (let i = 0; i < rawSig.length; i++) {\n    hash = ((hash << 5) - hash) + rawSig.charCodeAt(i);\n    hash |= 0;\n}\nconst idempotencyKey = 'IDEM-' + Math.abs(hash).toString(16);\n\nreturn [{\n    json: {\n        order_payload: payload,\n        idempotency_key: idempotencyKey,\n        ingested_at: new Date().toISOString()\n    }\n}];"
+      },
+      "name": "Normalize & Idempotency",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:8080/api/w/demo/jobs/run/p/f/order_scm/appealing_script",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.WINDMILL_API_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"order_payload\": $json.order_payload\n}",
+        "options": {}
+      },
+      "name": "Invoke Windmill SCM Orchestrator",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Ingestion": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Idempotency",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize & Idempotency": {
+      "main": [
+        [
+          {
+            "node": "Invoke Windmill SCM Orchestrator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

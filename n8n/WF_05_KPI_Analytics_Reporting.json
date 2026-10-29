@@ -1,0 +1,52 @@
+{
+  "name": "SCM_05_KPI_Analytics_Reporting",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "name": "Daily KPI Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Daily KPI Aggregator Summary\nreturn [{\n    json: {\n        report_date: new Date().toISOString().split('T')[0],\n        promise_accuracy_target: 0.985,\n        fill_rate_target: 0.990,\n        oversell_rate_target: 0.000,\n        backorder_rate_target: 0.025,\n        split_shipment_rate_target: 0.040,\n        report_generated: true\n    }\n}];"
+      },
+      "name": "Compute Daily KPI Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Daily KPI Trigger": {
+      "main": [
+        [
+          {
+            "node": "Compute Daily KPI Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

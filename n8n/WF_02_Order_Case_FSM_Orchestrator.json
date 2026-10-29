@@ -1,0 +1,100 @@
+{
+  "name": "SCM_02_Order_Case_FSM_Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 30
+            }
+          ]
+        }
+      },
+      "name": "FSM Poll Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:8080/api/w/demo/jobs/run/p/f/order_scm/appealing_script",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.WINDMILL_API_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"order_payload\": {\n    \"channel\": \"BATCH_POLL\",\n    \"external_order_ref\": \"POLL-\" + Date.now(),\n    \"customer_id\": \"CUST-STRAT-001\",\n    \"lines\": [{\"sku\": \"SKU-LAPTOP-PRO\", \"quantity\": 2, \"uom\": \"EA\"}]\n  }\n}",
+        "options": {}
+      },
+      "name": "Trigger Windmill Orchestrator",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "SUCCESS"
+            }
+          ]
+        }
+      },
+      "name": "Check FSM Status",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        660,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "FSM Poll Trigger": {
+      "main": [
+        [
+          {
+            "node": "Trigger Windmill Orchestrator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Windmill Orchestrator": {
+      "main": [
+        [
+          {
+            "node": "Check FSM Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "name": "SCM_03_Execution_Release_Adapter",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "scm-release-dispatch",
+        "options": {}
+      },
+      "name": "Release Dispatch Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format WMS release dispatch packet\nconst body = $input.first().json.body || $input.first().json;\nconst packets = body.dispatch_packets || [];\n\nreturn packets.map(p => ({\n    json: {\n        wms_target: p.target_system,\n        dispatch_id: p.dispatch_id,\n        sku: p.sku,\n        allocated_qty: p.allocated_qty,\n        scheduled_date: p.scheduled_dispatch_date,\n        released_at: new Date().toISOString()\n    }\n}));"
+      },
+      "name": "Format WMS EDI Packet",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Release Dispatch Webhook": {
+      "main": [
+        [
+          {
+            "node": "Format WMS EDI Packet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
