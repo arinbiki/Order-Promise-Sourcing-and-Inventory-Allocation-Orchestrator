@@ -36,7 +36,7 @@
 ### 🎨 Interactive Architecture Visual
 
 > [!TIP]
-> **Experience the Live Interactive Architecture Visual**: Open [`visuals/order-orchestrator-architecture.html`](file:///d:/Docker/windmill/windmill%20projects/Order%20Promise,%20Sourcing,%20and%20Inventory%20Allocation%20Orchestrator/visuals/order-orchestrator-architecture.html) in any modern web browser.
+> **Experience the Live Interactive Architecture Visual**: Open [`visuals/order-orchestrator-architecture.html`](visuals/order-orchestrator-architecture.html) in any modern web browser.
 > 
 > * **Animated Signal-Flow Tracing**: Real-time particle animations illustrating order trajectories from omnichannel checkout down to WMS pick waves.
 > * **Interactive Theme Toggle**: Switch seamlessly between Dark Mode (`signal-flow` neon blueprint) and Light Mode.
@@ -226,7 +226,7 @@ Every operational decision in the pipeline is executed by pure mathematical form
 ```
 
 ##### 1. The 17-State Finite State Machine (FSM)
-Implemented in [`appealing_script.py`](file:///d:/Docker/windmill/windmill%20projects/Order%20Promise,%20Sourcing,%20and%20Inventory%20Allocation%20Orchestrator/windmill/appealing_script.py), the FSM governs order progression through explicit, non-bypassable states:
+Implemented in [`windmill/appealing_script.py`](./windmill/appealing_script.py), the FSM governs order progression through explicit, non-bypassable states:
 `DRAFT` ➔ `ORDER_RECEIVED` ➔ `SCHEMA_VALIDATION` ➔ `MASTER_DATA_ENRICHED` ➔ `FINANCIAL_FRAUD_CHECK` ➔ `INVENTORY_CONVERGENCE` ➔ `ATP_CTP_CALCULATION` ➔ `SUBSTITUTION_EVALUATION` ➔ `SOURCING_CANDIDATE_GENERATION` ➔ `ALLOCATION_OPTIMIZATION` ➔ `PROMISE_GENERATION` ➔ `RELEASE_PREPARATION` ➔ `RELEASED`.
 Exception states branch strictly into `CREDIT_HOLD`, `FRAUD_HOLD`, `BACKORDERED`, `MANUAL_REVIEW`, or `CANCELLED_ROLLBACK`.
 
@@ -253,7 +253,7 @@ $$\Phi = \left( 1.0 - 0.20 \times \mathbb{I}_{\text{degraded}} \right) \times \t
 ### 🏛️ System Architecture
 
 > [!TIP]
-> **Explore the Interactive Architecture Visual**: Open [`visuals/order-orchestrator-architecture.html`](file:///d:/Docker/windmill/windmill%20projects/Order%20Promise,%20Sourcing,%20and%20Inventory%20Allocation%20Orchestrator/visuals/order-orchestrator-architecture.html) in your browser for a standalone, showcase-grade interactive architecture diagram built with [Archify](https://github.com/tt-a1i/archify). It includes live animated signal-flow traces, dark/light theme switching, zoom/pan navigation, architectural cards, and export capabilities.
+> **Explore the Interactive Architecture Visual**: Open [`visuals/order-orchestrator-architecture.html`](visuals/order-orchestrator-architecture.html) in your browser for a standalone, showcase-grade interactive architecture diagram built with [Archify](https://github.com/tt-a1i/archify). It includes live animated signal-flow traces, dark/light theme switching, zoom/pan navigation, architectural cards, and export capabilities.
 
 The solution operates as a decoupled, event-driven reactive architecture across four primary operational tiers:
 
@@ -604,7 +604,7 @@ The orchestrator was benchmarked under real-time enterprise distributions (Paret
 
 ### 🧪 Golden Order Test Suite (10/10 PASS)
 
-Located at [`tests/golden_order_test_suite.py`](file:///d:/Docker/windmill/windmill%20projects/Order%20Promise,%20Sourcing,%20and%20Inventory%20Allocation%20Orchestrator/tests/golden_order_test_suite.py):
+Located at [`tests/golden_order_test_suite.py`](./tests/golden_order_test_suite.py):
 
 | # | Scenario Name | Test Objective & Verification | Expected Outcome | Result |
 |---|---|---|---|---|
